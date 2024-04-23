@@ -1,8 +1,8 @@
 package com.zyuhoo.mini.mybatis.binding;
 
 import com.zyuhoo.mini.mybatis.dao.UserDao;
-import java.util.HashMap;
-import java.util.Map;
+import com.zyuhoo.mini.mybatis.session.SqlSession;
+import com.zyuhoo.mini.mybatis.session.defaults.DefaultSqlSession;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -13,11 +13,13 @@ public class MapperProxyFactoryTest {
 
     @Test
     public void newInstance() {
-        MapperProxyFactory<UserDao> mapperProxyFactory = new MapperProxyFactory<>(UserDao.class);
-        Map<String, String> sqlSession = new HashMap<>();
-        sqlSession.put("com.zyuhoo.mini.mybatis.dao.UserDao.queryUserName", "sql for queryUserName");
-        sqlSession.put("com.zyuhoo.mini.mybatis.dao.UserDao.queryUserAge", "sql for queryUserAge");
+        MapperRegistry mapperRegistry = new MapperRegistry();
+        String packageName = "com.zyuhoo.mini.mybatis.dao";
+        mapperRegistry.addMappers(packageName);
 
+        SqlSession sqlSession = new DefaultSqlSession(mapperRegistry);
+
+        MapperProxyFactory<UserDao> mapperProxyFactory = new MapperProxyFactory<>(UserDao.class);
         UserDao userDao = mapperProxyFactory.newInstance(sqlSession);
         String s = userDao.queryUserName("10001");
         log.info("the res: {}", s);

@@ -1,7 +1,7 @@
 package com.zyuhoo.mini.mybatis.binding;
 
+import com.zyuhoo.mini.mybatis.session.SqlSession;
 import java.lang.reflect.Proxy;
-import java.util.Map;
 
 /**
  * Mapper proxy instance factory.
@@ -21,7 +21,7 @@ public class MapperProxyFactory<T> {
      * @return new proxy object
      */
     @SuppressWarnings("unchecked")
-    public T newInstance(Map<String, String> sqlSession) {
+    public T newInstance(SqlSession sqlSession) {
         final MapperProxy<T> mapperProxy = new MapperProxy<>(sqlSession, mapperInterface);
         return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), new Class[] {mapperInterface}, mapperProxy);
     }

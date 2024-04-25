@@ -1,6 +1,7 @@
 package com.zyuhoo.mini.mybatis.binding;
 
 import com.zyuhoo.mini.mybatis.dao.UserDao;
+import com.zyuhoo.mini.mybatis.session.Configuration;
 import com.zyuhoo.mini.mybatis.session.SqlSession;
 import com.zyuhoo.mini.mybatis.session.defaults.DefaultSqlSession;
 import org.junit.Assert;
@@ -13,11 +14,11 @@ public class MapperProxyFactoryTest {
 
     @Test
     public void newInstance() {
-        MapperRegistry mapperRegistry = new MapperRegistry();
+        Configuration configuration = new Configuration();
         String packageName = "com.zyuhoo.mini.mybatis.dao";
-        mapperRegistry.addMappers(packageName);
+        configuration.addMappers(packageName);
 
-        SqlSession sqlSession = new DefaultSqlSession(mapperRegistry);
+        SqlSession sqlSession = new DefaultSqlSession(configuration);
 
         MapperProxyFactory<UserDao> mapperProxyFactory = new MapperProxyFactory<>(UserDao.class);
         UserDao userDao = mapperProxyFactory.newInstance(sqlSession);

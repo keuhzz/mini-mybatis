@@ -10,11 +10,11 @@ public class SqlSessionFactoryTest {
 
     @Test
     public void openSession() {
-        MapperRegistry mapperRegistry = new MapperRegistry();
+        Configuration configuration = new Configuration();
         String packageName = "com.zyuhoo.mini.mybatis.dao";
-        mapperRegistry.addMappers(packageName);
+        configuration.addMappers(packageName);
 
-        SqlSessionFactory sqlSessionFactory = new DefaultSqlSessionFactory(mapperRegistry);
+        SqlSessionFactory sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
         SqlSession sqlSession = sqlSessionFactory.openSession();
 
         UserDao userDao = sqlSession.getMapper(UserDao.class);

@@ -1,6 +1,6 @@
 package com.zyuhoo.mini.mybatis.session.defaults;
 
-import com.zyuhoo.mini.mybatis.binding.MapperRegistry;
+import com.zyuhoo.mini.mybatis.session.Configuration;
 import com.zyuhoo.mini.mybatis.session.SqlSession;
 import com.zyuhoo.mini.mybatis.session.SqlSessionFactory;
 
@@ -9,14 +9,14 @@ import com.zyuhoo.mini.mybatis.session.SqlSessionFactory;
  */
 public class DefaultSqlSessionFactory implements SqlSessionFactory {
 
-    private final MapperRegistry mapperRegistry;
+    private final Configuration configuration;
 
-    public DefaultSqlSessionFactory(MapperRegistry mapperRegistry) {
-        this.mapperRegistry = mapperRegistry;
+    public DefaultSqlSessionFactory(Configuration configuration) {
+        this.configuration = configuration;
     }
 
     @Override
     public SqlSession openSession() {
-        return new DefaultSqlSession(mapperRegistry);
+        return new DefaultSqlSession(configuration);
     }
 }

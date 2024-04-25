@@ -8,5 +8,7 @@ public interface SqlSession {
 
     <T> T selectOne(String statement, Object parameter);
 
+    Configuration getConfiguration();
+
     <T> T getMapper(Class<T> type);
 }

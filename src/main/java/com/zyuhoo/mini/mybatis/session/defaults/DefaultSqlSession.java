@@ -1,16 +1,16 @@
 package com.zyuhoo.mini.mybatis.session.defaults;
 
-import com.zyuhoo.mini.mybatis.binding.MapperRegistry;
+import com.zyuhoo.mini.mybatis.session.Configuration;
 import com.zyuhoo.mini.mybatis.session.SqlSession;
 
 /**
  * SqlSession 默认实现.
  */
 public class DefaultSqlSession implements SqlSession {
-    private final MapperRegistry mapperRegistry;
+    private final Configuration configuration;
 
-    public DefaultSqlSession(MapperRegistry mapperRegistry) {
-        this.mapperRegistry = mapperRegistry;
+    public DefaultSqlSession(Configuration configuration) {
+        this.configuration = configuration;
     }
 
     @SuppressWarnings("unchecked")
@@ -26,7 +26,12 @@ public class DefaultSqlSession implements SqlSession {
     }
 
     @Override
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    @Override
     public <T> T getMapper(Class<T> type) {
-        return mapperRegistry.getMapper(type, this);
+        return configuration.getMapper(type, this);
     }
 }

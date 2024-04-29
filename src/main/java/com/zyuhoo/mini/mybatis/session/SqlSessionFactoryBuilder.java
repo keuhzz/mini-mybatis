@@ -2,6 +2,7 @@ package com.zyuhoo.mini.mybatis.session;
 
 import com.zyuhoo.mini.mybatis.builder.xml.XmlConfigBuilder;
 import com.zyuhoo.mini.mybatis.session.defaults.DefaultSqlSessionFactory;
+import java.io.Reader;
 
 /**
  * About SqlSessionFactoryBuilder.
@@ -10,8 +11,8 @@ import com.zyuhoo.mini.mybatis.session.defaults.DefaultSqlSessionFactory;
  */
 public class SqlSessionFactoryBuilder {
 
-    public SqlSessionFactory build() {
-        XmlConfigBuilder xmlConfigBuilder = new XmlConfigBuilder();
+    public SqlSessionFactory build(Reader reader) {
+        XmlConfigBuilder xmlConfigBuilder = new XmlConfigBuilder(reader);
         return new DefaultSqlSessionFactory(xmlConfigBuilder.parse());
     }
 

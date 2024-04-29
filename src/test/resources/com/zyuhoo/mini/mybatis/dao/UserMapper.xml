@@ -7,4 +7,9 @@
     FROM user
     WHERE id = #{id}
   </select>
+  <select id="queryUserName" parameterType="java.lang.String" resultType="java.lang.String">
+    SELECT user_head
+    FROM user
+    WHERE user_id = #{userId}
+  </select>
 </mapper>

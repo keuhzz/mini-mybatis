@@ -1,25 +1,35 @@
 package com.zyuhoo.mini.mybatis.session;
 
+import com.zyuhoo.mini.mybatis.binding.MapperProxyFactoryTest;
 import com.zyuhoo.mini.mybatis.binding.MapperRegistry;
 import com.zyuhoo.mini.mybatis.dao.UserDao;
+import com.zyuhoo.mini.mybatis.io.Resources;
+import com.zyuhoo.mini.mybatis.mapping.MappedStatement;
 import com.zyuhoo.mini.mybatis.session.defaults.DefaultSqlSessionFactory;
+import java.io.IOException;
+import java.io.Reader;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SqlSessionFactoryTest {
+    private static final Logger log = LoggerFactory.getLogger(SqlSessionFactoryTest.class);
 
     @Test
     public void openSession() {
-        Configuration configuration = new Configuration();
-        String packageName = "com.zyuhoo.mini.mybatis.dao";
-        configuration.addMappers(packageName);
-
-        SqlSessionFactory sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
+        Reader reader = null;
+        try {
+            reader = Resources.getResourceAsReader("./datasource-config.xml");
+        } catch (IOException e) {
+            log.info("load datasource config fail", e);
+        }
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
         SqlSession sqlSession = sqlSessionFactory.openSession();
-
-        UserDao userDao = sqlSession.getMapper(UserDao.class);
-
-        String s = userDao.queryUserName("10234");
-        Assert.assertTrue(s != null && s.startsWith("execute proxy method invoke"));
+        Configuration configuration = sqlSession.getConfiguration();
+        MappedStatement mappedStatement =
+            configuration.getMappedStatement("com.zyuhoo.mini.mybatis.dao.UserDao.queryUserInfoById");
+        String sql = mappedStatement.getSql();
+        Assert.assertTrue(sql != null && sql.contains("SELECT"));
     }
 }

@@ -8,6 +8,7 @@ import java.util.Map;
  * @since 0.0.1
  */
 public class MappedStatement {
+
     private String id;
 
     private String parameterType;
@@ -20,9 +21,29 @@ public class MappedStatement {
 
     private Map<Integer, String> parameter;
 
-    MappedStatement() {}
+    MappedStatement() {
+    }
 
     // 建造者模式
+    public static class Builder {
+
+        private MappedStatement mappedStatement = new MappedStatement();
+
+        public Builder(String id, SqlCommandType sqlCommandType, String parameterType, String resultType, String sql,
+            Map<Integer, String> parameter) {
+            mappedStatement.id = id;
+            mappedStatement.parameterType = parameterType;
+            mappedStatement.resultType = resultType;
+            mappedStatement.sqlCommandType = sqlCommandType;
+            mappedStatement.sql = sql;
+            mappedStatement.parameter = parameter;
+        }
+
+        public MappedStatement build() {
+            assert mappedStatement.id != null;
+            return mappedStatement;
+        }
+    }
 
     public String getId() {
         return id;

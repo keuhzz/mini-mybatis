@@ -2,6 +2,7 @@ package com.zyuhoo.mini.mybatis.session;
 
 import com.zyuhoo.mini.mybatis.binding.MapperRegistry;
 import com.zyuhoo.mini.mybatis.mapping.MappedStatement;
+import com.zyuhoo.mini.mybatis.type.TypeAliasRegistry;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +19,8 @@ public class Configuration {
 
     // mapper xml: Dao interface <-> SQL
     protected final Map<String, MappedStatement> mappedStatements = new HashMap<>();
+
+    protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
 
 
     public void addMappers(String packageName) {
@@ -38,5 +41,9 @@ public class Configuration {
 
     public MappedStatement getMappedStatement(String id) {
         return mappedStatements.get(id);
+    }
+
+    public TypeAliasRegistry getTypeAliasRegistry() {
+        return typeAliasRegistry;
     }
 }

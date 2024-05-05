@@ -1,7 +1,10 @@
 package com.zyuhoo.mini.mybatis.session;
 
 import com.zyuhoo.mini.mybatis.binding.MapperRegistry;
+import com.zyuhoo.mini.mybatis.datasource.druid.DruidDataSourceFactory;
+import com.zyuhoo.mini.mybatis.mapping.Environment;
 import com.zyuhoo.mini.mybatis.mapping.MappedStatement;
+import com.zyuhoo.mini.mybatis.transaction.jdbc.JdbcTransactionFactory;
 import com.zyuhoo.mini.mybatis.type.TypeAliasRegistry;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +16,8 @@ import java.util.Map;
  */
 public class Configuration {
 
+    protected Environment environment;
+
     protected MapperRegistry mapperRegistry = new MapperRegistry();
 
     // 全局 config
@@ -21,6 +26,11 @@ public class Configuration {
     protected final Map<String, MappedStatement> mappedStatements = new HashMap<>();
 
     protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
+
+    public Configuration() {
+        typeAliasRegistry.registerAlias("JDBC", JdbcTransactionFactory.class);
+        typeAliasRegistry.registerAlias("DRUID", DruidDataSourceFactory.class);
+    }
 
 
     public void addMappers(String packageName) {
@@ -45,5 +55,13 @@ public class Configuration {
 
     public TypeAliasRegistry getTypeAliasRegistry() {
         return typeAliasRegistry;
+    }
+
+    public Environment getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 }

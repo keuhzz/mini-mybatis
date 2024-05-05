@@ -1,11 +1,7 @@
 package com.zyuhoo.mini.mybatis.session;
 
-import com.zyuhoo.mini.mybatis.binding.MapperProxyFactoryTest;
-import com.zyuhoo.mini.mybatis.binding.MapperRegistry;
-import com.zyuhoo.mini.mybatis.dao.UserDao;
 import com.zyuhoo.mini.mybatis.io.Resources;
 import com.zyuhoo.mini.mybatis.mapping.MappedStatement;
-import com.zyuhoo.mini.mybatis.session.defaults.DefaultSqlSessionFactory;
 import java.io.IOException;
 import java.io.Reader;
 import org.junit.Assert;
@@ -14,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SqlSessionFactoryTest {
+
     private static final Logger log = LoggerFactory.getLogger(SqlSessionFactoryTest.class);
 
     @Test

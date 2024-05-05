@@ -84,7 +84,7 @@ public class TypeAliasRegistry {
             return null;
         }
         String key = string.toLowerCase(Locale.ENGLISH);
-        if (typeAliases.containsKey(string)) {
+        if (typeAliases.containsKey(key)) {
             return (Class<T>) typeAliases.get(key);
         }
 

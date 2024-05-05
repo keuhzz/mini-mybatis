@@ -1,19 +1,24 @@
 package com.zyuhoo.mini.mybatis.builder.xml;
 
 import com.zyuhoo.mini.mybatis.builder.BaseBuilder;
+import com.zyuhoo.mini.mybatis.datasource.DataSourceFactory;
 import com.zyuhoo.mini.mybatis.io.Resources;
+import com.zyuhoo.mini.mybatis.mapping.Environment;
 import com.zyuhoo.mini.mybatis.mapping.MappedStatement;
 import com.zyuhoo.mini.mybatis.mapping.MappedStatement.Builder;
 import com.zyuhoo.mini.mybatis.mapping.SqlCommandType;
 import com.zyuhoo.mini.mybatis.session.Configuration;
+import com.zyuhoo.mini.mybatis.transaction.TransactionFactory;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.sql.DataSource;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -44,17 +49,53 @@ public class XmlConfigBuilder extends BaseBuilder {
     }
 
     public Configuration parse() {
-        Element mappers = root.element("mappers");
-        List<Element> mapperList = mappers.elements("mapper");
         try {
-            mapperElement(mapperList);
-        } catch (IOException | DocumentException | ClassNotFoundException e) {
+            environmentsElement(root.element("environments"));
+            mappersElement(root.element("mappers"));
+        } catch (IOException | DocumentException | ClassNotFoundException | InstantiationException
+                 | IllegalAccessException e) {
             throw new RuntimeException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
         }
         return configuration;
     }
 
-    private void mapperElement(List<Element> mapperList) throws IOException, DocumentException, ClassNotFoundException {
+    private void environmentsElement(Element environments) throws InstantiationException, IllegalAccessException {
+        String environment = environments.attributeValue("default");
+        List<Element> environmentList = environments.elements("environment");
+        for (Element e : environmentList) {
+            String id = e.attributeValue("id");
+            if (environment.equals(id)) {
+                // 事务管理器
+                Element transactionManagerElement = e.element("transactionManager");
+                String transactionType = transactionManagerElement.attributeValue("type");
+                Class<TransactionFactory> transactionFactoryClass = typeAliasRegistry.resolveAlias(transactionType);
+                TransactionFactory transactionFactory = transactionFactoryClass.newInstance();
+
+                // 数据源
+                Element dataSourceElement = e.element("dataSource");
+                String dataSourceType = dataSourceElement.attributeValue("type");
+                Class<DataSourceFactory> dataSourceFactoryClass = typeAliasRegistry.resolveAlias(dataSourceType);
+                DataSourceFactory dataSourceFactory = dataSourceFactoryClass.newInstance();
+                List<Element> propertyList = dataSourceElement.elements("property");
+                Properties props = new Properties();
+                for (Element p : propertyList) {
+                    props.setProperty(p.attributeValue("name"), p.attributeValue("value"));
+                }
+                dataSourceFactory.setProperties(props);
+                DataSource dataSource = dataSourceFactory.getDataSource();
+
+                // 构建环境
+                Environment env = new Environment.Builder(id)
+                    .transactionFactory(transactionFactory)
+                    .dataSource(dataSource)
+                    .build();
+                configuration.setEnvironment(env);
+            }
+        }
+    }
+
+    private void mappersElement(Element mappers) throws IOException, DocumentException, ClassNotFoundException {
+        List<Element> mapperList = mappers.elements("mapper");
         for (Element mapper : mapperList) {
             String resource = mapper.attributeValue("resource");
             Reader reader = Resources.getResourceAsReader(resource);

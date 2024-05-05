@@ -6,9 +6,9 @@ import com.zyuhoo.mini.mybatis.entity.User;
  * Provide dao interface test.
  */
 public interface UserDao {
-    String queryUserName(String userId);
+    String queryUserName(String phone);
 
-    String queryUsrAge(String userId);
+    String queryUsrAge(String phone);
 
     User queryUserInfoById(Long id);
 }

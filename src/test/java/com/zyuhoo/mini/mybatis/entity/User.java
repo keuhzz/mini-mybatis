@@ -11,13 +11,11 @@ public class User {
 
     private Long id;
 
-    private String userId;
+    private String phone;
 
-    private String userHead;
+    private String head;
 
-    private Date createTime;
-
-    private Date updateTime;
+    private Date birthday;
 
     public Long getId() {
         return id;
@@ -27,35 +25,32 @@ public class User {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
-    public String getUserHead() {
-        return userHead;
+    public String getHead() {
+        return head;
     }
 
-    public void setUserHead(String userHead) {
-        this.userHead = userHead;
+    public void setHead(String head) {
+        this.head = head;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Date getBirthday() {
+        return birthday;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
+    @Override
+    public String toString() {
+        return "User{id=" + id + ", phone='" + phone + '\'' + ", head='" + head + '\'' + ", birthday=" + birthday + '}';
     }
 }

@@ -29,8 +29,13 @@ public class MapperProxyFactoryTest {
         SqlSession sqlSession = sqlSessionFactory.openSession();
         UserDao userDao = sqlSession.getMapper(UserDao.class);
         long id = 1L;
-        User s = userDao.queryUserInfoById(id);
-        log.info("the res: {}", s);
+
+        // 循环测试
+        User s = null;
+        for (int i = 0; i < 50; i++) {
+            s = userDao.queryUserInfoById(id);
+            log.info("the res: {}", s);
+        }
         Assert.assertTrue(s != null && id == s.getId());
     }
 }

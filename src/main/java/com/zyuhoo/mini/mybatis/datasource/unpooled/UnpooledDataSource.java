@@ -25,6 +25,7 @@ public class UnpooledDataSource implements DataSource {
 
     private Properties driverProperties;
 
+    // 用于避免重复注册驱动
     private static Map<String, Driver> registeredDrivers = new ConcurrentHashMap<>();
 
     private String driver;

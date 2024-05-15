@@ -2,6 +2,7 @@ package com.zyuhoo.mini.mybatis.session;
 
 import com.zyuhoo.mini.mybatis.binding.MapperRegistry;
 import com.zyuhoo.mini.mybatis.datasource.druid.DruidDataSourceFactory;
+import com.zyuhoo.mini.mybatis.datasource.pooled.PooledDataSourceFactory;
 import com.zyuhoo.mini.mybatis.datasource.unpooled.UnpooledDataSourceFactory;
 import com.zyuhoo.mini.mybatis.mapping.Environment;
 import com.zyuhoo.mini.mybatis.mapping.MappedStatement;
@@ -32,6 +33,7 @@ public class Configuration {
         typeAliasRegistry.registerAlias("JDBC", JdbcTransactionFactory.class);
         typeAliasRegistry.registerAlias("DRUID", DruidDataSourceFactory.class);
         typeAliasRegistry.registerAlias("UNPOOLED", UnpooledDataSourceFactory.class);
+        typeAliasRegistry.registerAlias("POOLED", PooledDataSourceFactory.class);
     }
 
 

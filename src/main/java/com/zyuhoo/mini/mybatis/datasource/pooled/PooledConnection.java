@@ -14,6 +14,7 @@ import java.sql.SQLException;
 public class PooledConnection implements InvocationHandler {
 
     private static final Class<?>[] IFACES = {Connection.class};
+    private static final String CLOSE = "close";
 
     // 重写 hashCode 和 equals 方法
     private int hashCode = 0;
@@ -50,8 +51,14 @@ public class PooledConnection implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        // TODO 实现代理方法调用
-        return null;
+        if (CLOSE.equals(method.getName())) {
+            dataSource.pushConnection(this);
+            return null;
+        }
+        if (!Object.class.equals(method.getDeclaringClass())) {
+            checkConnection();
+        }
+        return method.invoke(realConnection, args);
     }
 
     public void checkConnection() throws SQLException {

@@ -10,7 +10,7 @@ import javax.sql.DataSource;
  * @since 0.0.1
  */
 public class UnpooledDataSourceFactory implements DataSourceFactory {
-    private Properties props;
+    protected Properties props;
 
     @Override
     public void setProperties(Properties props) {

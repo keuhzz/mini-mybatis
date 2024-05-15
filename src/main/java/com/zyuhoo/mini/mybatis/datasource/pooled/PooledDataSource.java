@@ -3,6 +3,7 @@ package com.zyuhoo.mini.mybatis.datasource.pooled;
 import com.zyuhoo.mini.mybatis.datasource.unpooled.UnpooledDataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.concurrent.TimeUnit;
@@ -30,9 +31,9 @@ public class PooledDataSource implements DataSource {
 
     private final UnpooledDataSource dataSource;
 
-    protected final int poolMaximumActiveConnections = 10;
+    protected int poolMaximumActiveConnections = 10;
 
-    protected final int poolMaximumIdleConnections = 5;
+    protected int poolMaximumIdleConnections = 5;
 
     private int poolMaximumCheckoutTime = 20000;
 
@@ -189,13 +190,65 @@ public class PooledDataSource implements DataSource {
 
     }
 
+    public void forceCloseAll() {
+        lock.lock();
+        try {
+            expectedConnectionTypeCode =
+                assembleConnectionTypeCode(dataSource.getUrl(), dataSource.getUsername(), dataSource.getPassword());
+            // 关闭活跃连接
+            for (int i = state.activeConnections.size(); i > 0; i--) {
+                try {
+                    PooledConnection conn = state.activeConnections.remove(i - 1);
+                    conn.invalidate();
+
+                    Connection realConn = conn.getRealConnection();
+                    if (!realConn.getAutoCommit()) {
+                        realConn.rollback();
+                    }
+                    realConn.close();
+                } catch (Exception e) {
+                    // ignore
+                }
+            }
+            // 关闭空闲连接
+            for (int i = state.idleConnections.size(); i > 0; i--) {
+                try {
+                    PooledConnection conn = state.idleConnections.remove(i - 1);
+                    conn.invalidate();
+
+                    Connection realConn = conn.getRealConnection();
+                    if (!realConn.getAutoCommit()) {
+                        realConn.rollback();
+                    }
+                    realConn.close();
+                } catch (Exception e) {
+                    // ignore
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+        log.info("PooledDataSource forcefully closed/removed all connections.");
+    }
+
     private int assembleConnectionTypeCode(String url, String username, String password) {
         return (url + username + password).hashCode();
     }
 
+    protected boolean pingConnection(PooledConnection conn) {
+        // TODO 实现连接探针
+        return true;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        forceCloseAll();
+        super.finalize();
+    }
+
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        return null;
+        throw new SQLException(getClass().getName() + " is not a wrapper.");
     }
 
     @Override
@@ -205,26 +258,119 @@ public class PooledDataSource implements DataSource {
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
-        return null;
+        return DriverManager.getLogWriter();
     }
 
     @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
+        DriverManager.setLogWriter(out);
 
     }
 
     @Override
     public void setLoginTimeout(int seconds) throws SQLException {
-
+        DriverManager.setLoginTimeout(seconds);
     }
 
     @Override
     public int getLoginTimeout() throws SQLException {
-        return 0;
+        return DriverManager.getLoginTimeout();
     }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        return null;
+        return Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    }
+
+    public void setDriver(String driver) {
+        dataSource.setDriver(driver);
+        forceCloseAll();
+    }
+
+    public void setUrl(String url) {
+        dataSource.setUrl(url);
+        forceCloseAll();
+    }
+
+    public void setUsername(String username) {
+        dataSource.setUsername(username);
+        forceCloseAll();
+    }
+
+    public void setPassword(String password) {
+        dataSource.setPassword(password);
+        forceCloseAll();
+    }
+
+    public int getPoolMaximumActiveConnections() {
+        return poolMaximumActiveConnections;
+    }
+
+    public void setPoolMaximumActiveConnections(int poolMaximumActiveConnections) {
+        this.poolMaximumActiveConnections = poolMaximumActiveConnections;
+    }
+
+    public int getPoolMaximumIdleConnections() {
+        return poolMaximumIdleConnections;
+    }
+
+    public void setPoolMaximumIdleConnections(int poolMaximumIdleConnections) {
+        this.poolMaximumIdleConnections = poolMaximumIdleConnections;
+    }
+
+    public int getPoolMaximumCheckoutTime() {
+        return poolMaximumCheckoutTime;
+    }
+
+    public void setPoolMaximumCheckoutTime(int poolMaximumCheckoutTime) {
+        this.poolMaximumCheckoutTime = poolMaximumCheckoutTime;
+    }
+
+    public int getPoolMaximumLocalBadConnectionTolerance() {
+        return poolMaximumLocalBadConnectionTolerance;
+    }
+
+    public void setPoolMaximumLocalBadConnectionTolerance(int poolMaximumLocalBadConnectionTolerance) {
+        this.poolMaximumLocalBadConnectionTolerance = poolMaximumLocalBadConnectionTolerance;
+    }
+
+    public int getPoolTimeToWait() {
+        return poolTimeToWait;
+    }
+
+    public void setPoolTimeToWait(int poolTimeToWait) {
+        this.poolTimeToWait = poolTimeToWait;
+    }
+
+    public String getPoolPingQuery() {
+        return poolPingQuery;
+    }
+
+    public void setPoolPingQuery(String poolPingQuery) {
+        this.poolPingQuery = poolPingQuery;
+    }
+
+    public boolean isPoolPingEnable() {
+        return poolPingEnable;
+    }
+
+    public void setPoolPingEnable(boolean poolPingEnable) {
+        this.poolPingEnable = poolPingEnable;
+    }
+
+    public int getPoolPingConnectionsNotUsedFor() {
+        return poolPingConnectionsNotUsedFor;
+    }
+
+    public void setPoolPingConnectionsNotUsedFor(int poolPingConnectionsNotUsedFor) {
+        this.poolPingConnectionsNotUsedFor = poolPingConnectionsNotUsedFor;
+    }
+
+    public int getExpectedConnectionTypeCode() {
+        return expectedConnectionTypeCode;
+    }
+
+    public void setExpectedConnectionTypeCode(int expectedConnectionTypeCode) {
+        this.expectedConnectionTypeCode = expectedConnectionTypeCode;
     }
 }

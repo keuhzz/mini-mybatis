@@ -26,7 +26,7 @@ public class SqlSessionFactoryTest {
         Configuration configuration = sqlSession.getConfiguration();
         MappedStatement mappedStatement =
             configuration.getMappedStatement("com.zyuhoo.mini.mybatis.dao.UserDao.queryUserInfoById");
-        String sql = mappedStatement.getSql();
+        String sql = mappedStatement.getBoundSql().getSql();
         Assert.assertTrue(sql != null && sql.contains("SELECT"));
     }
 }

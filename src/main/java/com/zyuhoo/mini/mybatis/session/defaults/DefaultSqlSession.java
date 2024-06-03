@@ -1,6 +1,7 @@
 package com.zyuhoo.mini.mybatis.session.defaults;
 
 import com.zyuhoo.mini.mybatis.mapping.MappedStatement;
+import com.zyuhoo.mini.mybatis.mapping.BoundSql;
 import com.zyuhoo.mini.mybatis.session.Configuration;
 import com.zyuhoo.mini.mybatis.session.SqlSession;
 import java.lang.reflect.InvocationTargetException;
@@ -33,7 +34,8 @@ public class DefaultSqlSession implements SqlSession {
     public <T> T selectOne(String statement, Object parameter) {
         // TODO demo
         MappedStatement mappedStatement = configuration.getMappedStatement(statement);
-        String sql = mappedStatement.getSql();
+        BoundSql boundSql = mappedStatement.getBoundSql();
+        String sql = boundSql.getSql();
         T res;
         try {
             Connection connection = configuration.getEnvironment().getDataSource().getConnection();
@@ -41,7 +43,7 @@ public class DefaultSqlSession implements SqlSession {
             preparedStatement.setLong(1, Long.parseLong(((Object[]) parameter)[0].toString()));
             ResultSet resultSet = preparedStatement.executeQuery();
             ResultSetMetaData metaData = resultSet.getMetaData();
-            Class<T> resClass = (Class<T>) Class.forName(mappedStatement.getResultType());
+            Class<T> resClass = (Class<T>) Class.forName(boundSql.getResultType());
             res = resClass.newInstance();
             resultSet.next();
             for (int i = 1; i <= metaData.getColumnCount(); i++) {

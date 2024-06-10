@@ -4,8 +4,16 @@ import com.zyuhoo.mini.mybatis.binding.MapperRegistry;
 import com.zyuhoo.mini.mybatis.datasource.druid.DruidDataSourceFactory;
 import com.zyuhoo.mini.mybatis.datasource.pooled.PooledDataSourceFactory;
 import com.zyuhoo.mini.mybatis.datasource.unpooled.UnpooledDataSourceFactory;
+import com.zyuhoo.mini.mybatis.executor.Executor;
+import com.zyuhoo.mini.mybatis.executor.SimpleExecutor;
+import com.zyuhoo.mini.mybatis.executor.resultset.DefaultResultSetHandler;
+import com.zyuhoo.mini.mybatis.executor.resultset.ResultSetHandler;
+import com.zyuhoo.mini.mybatis.executor.statement.PreparedStatementHandler;
+import com.zyuhoo.mini.mybatis.executor.statement.StatementHandler;
+import com.zyuhoo.mini.mybatis.mapping.BoundSql;
 import com.zyuhoo.mini.mybatis.mapping.Environment;
 import com.zyuhoo.mini.mybatis.mapping.MappedStatement;
+import com.zyuhoo.mini.mybatis.transaction.Transaction;
 import com.zyuhoo.mini.mybatis.transaction.jdbc.JdbcTransactionFactory;
 import com.zyuhoo.mini.mybatis.type.TypeAliasRegistry;
 import java.util.HashMap;
@@ -67,5 +75,27 @@ public class Configuration {
 
     public void setEnvironment(Environment environment) {
         this.environment = environment;
+    }
+
+    /**
+     * 创建结果集处理器.
+     */
+    public ResultSetHandler newResultSetHandler(Executor executor, MappedStatement mappedStatement, BoundSql boundSql) {
+        return new DefaultResultSetHandler(executor, mappedStatement, boundSql);
+    }
+
+    /**
+     * 创建执行器.
+     */
+    public Executor newExecutor(Transaction transaction) {
+        return new SimpleExecutor(this, transaction);
+    }
+
+    /**
+     * 创建语句处理器.
+     */
+    public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameter,
+        BoundSql boundSql) {
+        return new PreparedStatementHandler(executor, mappedStatement, parameter, boundSql);
     }
 }

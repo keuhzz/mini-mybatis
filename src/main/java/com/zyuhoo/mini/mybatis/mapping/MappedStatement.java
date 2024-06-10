@@ -1,11 +1,14 @@
 package com.zyuhoo.mini.mybatis.mapping;
 
+import com.zyuhoo.mini.mybatis.session.Configuration;
+
 /**
  * About MappedStatement.
  *
  * @since 0.0.1
  */
 public class MappedStatement {
+    private Configuration configuration;
 
     private String id;
 
@@ -21,16 +24,22 @@ public class MappedStatement {
 
         private MappedStatement mappedStatement = new MappedStatement();
 
-        public Builder(String id, SqlCommandType sqlCommandType, BoundSql boundSql) {
+        public Builder(Configuration configuration, String id, SqlCommandType sqlCommandType, BoundSql boundSql) {
+            mappedStatement.configuration = configuration;
             mappedStatement.id = id;
             mappedStatement.sqlCommandType = sqlCommandType;
             mappedStatement.boundSql = boundSql;
         }
 
         public MappedStatement build() {
+            assert mappedStatement.configuration != null;
             assert mappedStatement.id != null;
             return mappedStatement;
         }
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
     public String getId() {

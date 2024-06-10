@@ -153,6 +153,7 @@ public class PooledDataSource implements DataSource {
     protected void pushConnection(PooledConnection connection) throws SQLException {
         lock.lock();
         try {
+            state.activeConnections.remove(connection);
             if (connection.isValid()) {
                 if (state.idleConnections.size() < poolMaximumIdleConnections
                     && connection.getConnectionTypeCode() == expectedConnectionTypeCode) {
@@ -160,7 +161,8 @@ public class PooledDataSource implements DataSource {
                     if (!connection.getRealConnection().getAutoCommit()) {
                         connection.getRealConnection().rollback();
                     }
-                    // TODO 为什么要在真实的连接基础上再创建一个代理连接, 而不是直接使用原代理连接
+                    // Q: 为什么要在真实的连接基础上再创建一个代理连接放进空闲连接队列, 而不是直接将原代理连接放进空闲连接队列
+                    // A: 此时使用方可能依旧持有原代理连接, 并且可能(不合规)继续使用. 所以需要重新新建代理连接, 并将原代理连接失效
                     PooledConnection newConnection = new PooledConnection(connection.getRealConnection(), this);
                     state.idleConnections.add(newConnection);
                     newConnection.setCreatedTimestamp(connection.getCreatedTimestamp());

@@ -3,9 +3,9 @@ package com.zyuhoo.mini.mybatis.builder.xml;
 import com.zyuhoo.mini.mybatis.builder.BaseBuilder;
 import com.zyuhoo.mini.mybatis.datasource.DataSourceFactory;
 import com.zyuhoo.mini.mybatis.io.Resources;
+import com.zyuhoo.mini.mybatis.mapping.BoundSql;
 import com.zyuhoo.mini.mybatis.mapping.Environment;
 import com.zyuhoo.mini.mybatis.mapping.MappedStatement;
-import com.zyuhoo.mini.mybatis.mapping.BoundSql;
 import com.zyuhoo.mini.mybatis.mapping.SqlCommandType;
 import com.zyuhoo.mini.mybatis.session.Configuration;
 import com.zyuhoo.mini.mybatis.transaction.TransactionFactory;
@@ -125,7 +125,8 @@ public class XmlConfigBuilder extends BaseBuilder {
                 String nodeName = node.getName();
                 SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ROOT));
                 BoundSql boundSql = new BoundSql(sql, parameter, parameterType, resultType);
-                MappedStatement mappedStatement = new MappedStatement.Builder(msId, sqlCommandType, boundSql).build();
+                MappedStatement mappedStatement =
+                    new MappedStatement.Builder(configuration, msId, sqlCommandType, boundSql).build();
                 // 添加 SQL 解析
                 configuration.addMappedStatement(mappedStatement);
             }
